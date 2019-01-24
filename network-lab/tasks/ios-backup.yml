@@ -1,0 +1,13 @@
+---
+
+- name: show running config
+  ios_command:
+    commands: show running
+    provider: "{{ ioscli }}"
+  register: backup
+  check_mode: no
+
+- name: backup running config
+  copy:
+    content: "{{ backup.stdout[0] }}"
+    dest: "./backup/{{ inventory_hostname }}_running-config.conf"

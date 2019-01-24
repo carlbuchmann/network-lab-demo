@@ -1,0 +1,30 @@
+- hosts: iwan
+
+
+  vars:
+    day: "{{ lookup('pipe', 'date +%d') }}"
+    month: "{{ lookup('pipe', 'date +%b') }}"
+    year: "{{ lookup('pipe', 'date +%Y') }}"
+    time: "{{ lookup('pipe', 'date +%R:%S') }}"
+
+  tasks:
+    - name: Collect Environment State Information
+      ios_command:
+        provider: "{{ ioscli }}"
+        commands:
+          - show ip route
+          - show ip interface brief
+          - show ip eigrp neighbor
+      register: env_state_results
+
+    - name: Create Environment Status Report - dated
+      template:
+        src: ./templates/reports/env-state.j2
+        dest: ./environment-state/timestamped/{{ inventory_hostname }}@{{ time }}-{{ day }}-{{ month }}-{{ year }}.md
+
+    - name: Create Environment Status Report - Latest
+      template:
+        src: ./templates/reports/env-state.j2
+        dest: ./environment-state/{{ inventory_hostname }}.md
+
+

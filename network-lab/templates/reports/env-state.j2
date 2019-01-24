@@ -1,0 +1,19 @@
+# {{ inventory_hostname }} Environment State Summary
+
+##  show ip route
+
+```
+{{ env_state_results.stdout[0] }}
+```
+
+##  show ip interface brief
+
+```
+{{ env_state_results.stdout[1] }}
+```
+
+##  show ip eigrp neighbor
+
+```
+{{ env_state_results.stdout[2] }}
+```

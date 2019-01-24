@@ -1,0 +1,46 @@
+---
+
+- hosts: localhost
+
+  tasks:
+
+    - name: create wan combinned template
+      assemble:
+        src: ./templates/wan/
+        dest: './templates/wan/combined/wan-config.j2'
+
+- hosts: iwan
+
+  tasks:
+
+    - set_fact: interface_facts=null
+    - set_fact: wan_config_file=./configurations/wan/{{inventory_hostname}}.cfg
+
+    - name: create running configuration per device
+      template:
+        src: './templates/wan/combined/wan-config.j2'
+        dest: "{{ wan_config_file }}"
+        trim_blocks: yes
+
+- hosts: iwan
+
+  vars:
+     wan_config: "{{ lookup('file', wan_config_file) }}"
+
+  tasks:
+
+    - name: create wan documentation per device
+      template:
+        src: './templates/documentation/wan/iwan-documentation.j2'
+        dest: './documentation/wan/devices/{{inventory_hostname}}-intent.md'
+
+- hosts: localhost
+
+  tasks:
+
+    - name: create wan combinned documentation
+      assemble:
+        src: ./documentation/wan/devices/
+        dest: './documentation/README.md'
+
+
